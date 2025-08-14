@@ -1,1 +1,45 @@
+name: Firestore to BigQuery Import
+
+on:
+  workflow_dispatch:  # manually trigger
+  schedule:
+    - cron: "0 * * * *" # every hour (UTC)
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.gcp_key }}
+
+      - name: Set gcloud project
+        run: gcloud config set project fir-practice-f5ec3
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: scripts/import
+
+      - name: Run Firestore import
+        run: |
+          node lib/index.js \
+            --non-interactive \
+            --project=fir-practice-f5ec3 \
+            --source-collection-path="try/{userId}/girls_been" \
+            --dataset=firestore_export \
+            --table-name-prefix=girls_been \
+            --batch-size=500 \
+            --multi-threaded=true \
+            --dataset-location=US
+        working-directory: scripts/import
 
