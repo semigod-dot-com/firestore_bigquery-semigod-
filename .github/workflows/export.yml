@@ -35,7 +35,8 @@ jobs:
           node lib/index.js \
             --non-interactive \
             --project=fir-practice-f5ec3 \
-            --source-collection-path="try/{userId}/girls_been" \
+            --query-collection-group=true \
+            --source-collection-path="girls_been" \
             --dataset=firestore_export \
             --table-name-prefix=girls_been \
             --batch-size=500 \
